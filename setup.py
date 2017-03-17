@@ -33,7 +33,7 @@ INSTALL_REQUIRES = ['termcolor']
 README = os.path.join(os.path.dirname(__file__), 'README.md')
 
 setup(
-    name='gunicorn-color-logger',
+    name='gunicorn_color',
     version=VERSION,
 
     description=(

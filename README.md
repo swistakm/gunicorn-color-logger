@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/swistakm/gunicorn-color-logger.svg?branch=master)](https://travis-ci.org/swistakm/gunicorn-color-logger)
+[![Coverage Status](https://coveralls.io/repos/github/swistakm/gunicorn-color-logger/badge.svg?branch=master)](https://coveralls.io/github/swistakm/gunicorn-color-logger?branch=master)
+
 # Gunicorn color logger
 
 Dead simple access logger for Gunicorn with termcolor support.
