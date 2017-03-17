@@ -5,6 +5,9 @@
 
 Dead simple access logger for Gunicorn with termcolor support.
 
+![screenshot](https://raw.githubusercontent.com/swistakm/gunicorn-color-logger/master/docs/screenshot.png)
+
+
 ## Usage
 
 Simply add `gunicorn_color` to your requirements file or install it manually:
