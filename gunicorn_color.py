@@ -1,6 +1,6 @@
 """Custom Gunicorn access logger with termcolor support."""
 
-VERSION = (0, 0, 1)  # PEP 386  # noqa
+VERSION = (0, 0, 2)  # PEP 386  # noqa
 __version__ = ".".join([str(x) for x in VERSION])  # noqa
 
 import os

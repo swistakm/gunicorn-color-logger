@@ -46,7 +46,7 @@ setup(
 
     py_modules=['gunicorn_color'],
     include_package_data=True,
-    install_requires=[],
+    install_requires=INSTALL_REQUIRES,
     zip_safe=False,
 
     license='BSD',
