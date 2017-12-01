@@ -1,6 +1,9 @@
+import time
+import sys
+
 try:
     from types import SimpleNamespace
-except ImportError:
+except ImportError:  # pragma: no cover
     class SimpleNamespace(object):
         def __init__(self, **kwargs):
             self.__dict__.update(kwargs)
@@ -15,13 +18,28 @@ except ImportError:
 
 try:
     from unittest.mock import Mock
-except ImportError:
+except ImportError:  # pragma: no cover
     from mock import Mock
 
 import pytest
 
-import gunicorn_color
+try:
+    from aiohttp.web import Response as AiohttpResponse
+    from aiohttp.test_utils import (
+        make_mocked_request as make_aiohttp_request_mock
+    )
+except ImportError:
+    pass
+
 from gunicorn.config import Config
+
+import gunicorn_color
+
+
+aiohttp_optional = pytest.mark.skipif(
+    sys.version_info < (3, 4),
+    reason="aiohttp does not support Python < 3.5"
+)
 
 
 @pytest.fixture
@@ -59,7 +77,7 @@ def test_with_color(access_args, monkeypatch):
 
 
 def test_without_color(access_args, monkeypatch):
-    monkeypatch.setattr(gunicorn_color, 'supports_color', lambda: True)
+    monkeypatch.setattr(gunicorn_color, 'supports_color', lambda: False)
     monkeypatch.setenv('ANSI_COLORS_DISABLED', '')
 
     cfg = Config()
@@ -72,5 +90,43 @@ def test_without_color(access_args, monkeypatch):
 
     msg = logger.access_log.info.call_args[0][0]
 
+    assert not msg.startswith('\x1b[')
+    assert not msg.endswith('\x1b[0m')
+
+
+@aiohttp_optional
+def test_aiohttp_with_color(monkeypatch):
+    monkeypatch.setattr(gunicorn_color, 'supports_color', lambda: True)
+
+    request = make_aiohttp_request_mock('GET', '/', headers={'token': 'x'})
+    response = AiohttpResponse()
+
+    mock_logger = Mock()
+
+    logger = gunicorn_color.AiohttpLogger(mock_logger)
+    logger.log(request, response, time.time())
+
+    assert mock_logger.info.called
+    # this is the last msg passed to logger through info
+    msg = mock_logger.info.call_args[0][0]
+    assert msg.startswith('\x1b[')
+    assert msg.endswith('\x1b[0m')
+
+
+@aiohttp_optional
+def test_aiohttp_without_color(monkeypatch):
+    monkeypatch.setattr(gunicorn_color, 'supports_color', lambda: False)
+
+    request = make_aiohttp_request_mock('GET', '/', headers={'token': 'x'})
+    response = AiohttpResponse()
+
+    mock_logger = Mock()
+
+    logger = gunicorn_color.AiohttpLogger(mock_logger)
+    logger.log(request, response, time.time())
+
+    assert mock_logger.info.called
+    # this is the last msg passed to logger through info
+    msg = mock_logger.info.call_args[0][0]
     assert not msg.startswith('\x1b[')
     assert not msg.endswith('\x1b[0m')
